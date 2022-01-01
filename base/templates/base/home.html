@@ -2,4 +2,9 @@
 
 {% block content %}
     <h1>Home Page</h1>
+
+    {% for group in groups %}
+        {{ group.id }} -- {{ group.name }}
+        <br>
+    {% endfor %}
 {% endblock content %}
