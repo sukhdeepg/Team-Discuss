@@ -4,8 +4,12 @@
     <h1>Home Page</h1>
 
     <div>
+        <a href="{% url 'create-group' %}">Create Group</a>
+
         {% for group in groups %}
             <div>
+                <a href="{% url 'update-group' group.id %}">Edit</a>
+                <a href="{% url 'delete-group' group.id %}">Delete</a>
                 <span>@{{group.moderator.username}}</span>
                 <h5>{{ group.id }} -- <a href="{% url 'group' group.id %}">{{ group.name }}</a></h5>
                 <small>{{ group.subject }}</small>

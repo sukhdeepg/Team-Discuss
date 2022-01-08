@@ -15,6 +15,8 @@ class Group(models.Model):
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
+    class Meta:
+        ordering = ['-updated', '-created'] # to show the list in a descending order
 
     def __str__(self) -> str:
         return self.name
