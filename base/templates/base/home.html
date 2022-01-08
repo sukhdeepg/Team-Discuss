@@ -3,8 +3,13 @@
 {% block content %}
     <h1>Home Page</h1>
 
-    {% for group in groups %}
-        {{ group.id }} -- {{ group.name }}
-        <br>
-    {% endfor %}
+    <div>
+        {% for group in groups %}
+            <div>
+                <span>@{{group.moderator.username}}</span>
+                <h5>{{ group.id }} -- <a href="{% url 'group' group.id %}">{{ group.name }}</a></h5>
+                <small>{{ group.subject }}</small>
+            </div>
+        {% endfor %}
+    </div>
 {% endblock content %}
