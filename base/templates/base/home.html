@@ -1,19 +1,48 @@
 {% extends 'main.html' %}
 
 {% block content %}
-    <h1>Home Page</h1>
+    
+    <style>
+        .home-container {
+            display: grid;
+            grid-template-columns: 1fr 3fr; /* fr: fraction */
+        }
+    </style>
 
-    <div>
-        <a href="{% url 'create-group' %}">Create Group</a>
+    <div class="home-container">
 
-        {% for group in groups %}
+        <div>
+            <h3>Browse Subjects</h3>
+            <hr>
+
             <div>
-                <a href="{% url 'update-group' group.id %}">Edit</a>
-                <a href="{% url 'delete-group' group.id %}">Delete</a>
-                <span>@{{group.moderator.username}}</span>
-                <h5>{{ group.id }} -- <a href="{% url 'group' group.id %}">{{ group.name }}</a></h5>
-                <small>{{ group.subject }}</small>
+                <a href="{% url 'home' %}">All</a>
             </div>
-        {% endfor %}
+
+            {% for subject in subjects %}
+                <div>
+                    <a href="{% url 'home' %}?q={{ subject.name }}">{{ subject.name }}</a>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div>
+            <h5>{{ group_count }} groups present</h5>
+            <a href="{% url 'create-group' %}">Create Group</a>
+
+            <div>
+                {% for group in groups %}
+                    <div>
+                        <a href="{% url 'update-group' group.id %}">Edit</a>
+                        <a href="{% url 'delete-group' group.id %}">Delete</a>
+                        <span>@{{group.moderator.username}}</span>
+                        <h5>{{ group.id }} -- <a href="{% url 'group' group.id %}">{{ group.name }}</a></h5>
+                        <small>{{ group.subject }}</small>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+
+       
     </div>
 {% endblock content %}

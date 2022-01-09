@@ -1,10 +1,20 @@
 from django.shortcuts import render, redirect
-from .models import Group
+from django.db.models import Q
+from .models import Group, Subject
 from .forms import GroupForm
 
 def home(request):
-    groups = Group.objects.all()
-    context = {"groups": groups}
+    q = request.GET.get('q', '')
+
+    groups = Group.objects.filter(
+        Q(subject__name__icontains=q) |
+        Q(name__icontains=q) |
+        Q(description__icontains=q)
+    )
+    group_count = groups.count()
+    subjects = Subject.objects.all()
+
+    context = {"groups": groups, "subjects": subjects, "group_count": group_count}
     return render(request, 'base/home.html', context)
 
 def group(request, pk):
