@@ -33,8 +33,11 @@
             <div>
                 {% for group in groups %}
                     <div>
-                        <a href="{% url 'update-group' group.id %}">Edit</a>
-                        <a href="{% url 'delete-group' group.id %}">Delete</a>
+                        {% if request.user == group.moderator %}
+                            <a href="{% url 'update-group' group.id %}">Edit</a>
+                            <a href="{% url 'delete-group' group.id %}">Delete</a>
+                        {% endif %}
+                        
                         <span>@{{group.moderator.username}}</span>
                         <h5>{{ group.id }} -- <a href="{% url 'group' group.id %}">{{ group.name }}</a></h5>
                         <small>{{ group.subject }}</small>

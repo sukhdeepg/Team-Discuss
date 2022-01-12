@@ -1,12 +1,17 @@
 from django.shortcuts import render, redirect
+from django.http import HttpResponse
 from django.db.models import Q
 from django.contrib.auth.models import User
 from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from .models import Group, Subject
 from .forms import GroupForm
 
 def login_user(request):
+
+    if request.user.is_authenticated:
+        return redirect('home')
 
     if request.method == 'POST':
         username = request.POST.get("username")
@@ -51,6 +56,7 @@ def group(request, pk):
     context = {"group": group}
     return render(request, 'base/group.html', context)
 
+@login_required(login_url='login')
 def create_group(request):
     form = GroupForm()
     if request.method == 'POST':
@@ -62,9 +68,13 @@ def create_group(request):
     context = {"form": form}
     return render(request, 'base/create_group.html', context)
 
+@login_required(login_url='login')
 def update_group(request, pk):
     group = Group.objects.get(id=pk)
     form = GroupForm(instance=group)
+
+    if request.user != group.moderator:
+        return HttpResponse('Action not allowed.')
 
     if request.method == 'POST':
         form = GroupForm(request.POST, instance=group)
@@ -75,8 +85,13 @@ def update_group(request, pk):
     context = {"form": form}
     return render(request, 'base/create_group.html', context)
 
+@login_required(login_url='login')
 def delete_group(request, pk):
     group = Group.objects.get(id=pk)
+
+    if request.user != group.moderator:
+        return HttpResponse('Action not allowed.')
+
     if request.method == "POST":
         group.delete()
         return redirect('home')
