@@ -9,7 +9,8 @@ from .models import Group, Subject
 from .forms import GroupForm
 
 def login_user(request):
-
+    page = 'login'
+    
     if request.user.is_authenticated:
         return redirect('home')
 
@@ -30,7 +31,13 @@ def login_user(request):
         else:
             messages.error(request, 'Username or password is incorrect.')
 
-    context = {}
+    context = {"page": page}
+    return render(request, 'base/access.html', context)
+
+def register_user(request):
+    page = 'register'
+    
+    context = {"page": page}
     return render(request, 'base/access.html', context)
 
 def logout_user(request):
