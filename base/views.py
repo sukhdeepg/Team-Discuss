@@ -6,7 +6,7 @@ from django.contrib.auth import authenticate, login, logout
 from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
-from .models import Group, Subject
+from .models import Group, Message, Subject
 from .forms import GroupForm
 
 def login_user(request):
@@ -73,7 +73,19 @@ def home(request):
 
 def group(request, pk):
     group = Group.objects.get(id=pk)
-    context = {"group": group}
+    group_messages = group.message_set.all().order_by('-created')
+    members = group.members.all()
+
+    if request.method == 'POST':
+        message = Message.objects.create(
+            user=request.user,
+            group=group,
+            message=request.POST.get('message')
+        )
+        group.members.add(request.user)
+        return redirect('group', pk=group.id)
+
+    context = {"group": group, "group_messages": group_messages, "members": members}
     return render(request, 'base/group.html', context)
 
 @login_required(login_url='login')
@@ -117,4 +129,18 @@ def delete_group(request, pk):
         return redirect('home')
 
     context = {"obj": group}
+    return render(request, 'base/delete.html', context)
+
+@login_required(login_url='login')
+def delete_message(request, pk):
+    message = Message.objects.get(id=pk)
+
+    if request.user != message.user:
+        return HttpResponse('Action not allowed.')
+
+    if request.method == "POST":
+        message.delete()
+        return redirect('home')
+
+    context = {"obj": message}
     return render(request, 'base/delete.html', context)

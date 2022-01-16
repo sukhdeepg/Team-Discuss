@@ -12,6 +12,7 @@ class Group(models.Model):
     subject = models.ForeignKey(Subject, on_delete=models.CASCADE)
     name = models.CharField(max_length=100)
     description = models.TextField(null=True, blank=True)
+    members = models.ManyToManyField(User, related_name='members', blank=True)
     updated = models.DateTimeField(auto_now=True)
     created = models.DateTimeField(auto_now_add=True)
 
