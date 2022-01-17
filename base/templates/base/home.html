@@ -5,47 +5,26 @@
     <style>
         .home-container {
             display: grid;
-            grid-template-columns: 1fr 3fr; /* fr: fraction */
+            grid-template-columns: 1fr 3fr 1fr; /* fr: fraction */
         }
     </style>
 
     <div class="home-container">
 
         <div>
-            <h3>Browse Subjects</h3>
-            <hr>
-
-            <div>
-                <a href="{% url 'home' %}">All</a>
-            </div>
-
-            {% for subject in subjects %}
-                <div>
-                    <a href="{% url 'home' %}?q={{ subject.name }}">{{ subject.name }}</a>
-                </div>
-            {% endfor %}
+            {% include 'base/subjects.html' %}
         </div>
 
         <div>
             <h5>{{ group_count }} groups present</h5>
             <a href="{% url 'create-group' %}">Create Group</a>
 
-            <div>
-                {% for group in groups %}
-                    <div>
-                        {% if request.user == group.moderator %}
-                            <a href="{% url 'update-group' group.id %}">Edit</a>
-                            <a href="{% url 'delete-group' group.id %}">Delete</a>
-                        {% endif %}
-                        
-                        <span>@{{group.moderator.username}}</span>
-                        <h5>{{ group.id }} -- <a href="{% url 'group' group.id %}">{{ group.name }}</a></h5>
-                        <small>{{ group.subject }}</small>
-                    </div>
-                {% endfor %}
-            </div>
+            {% include 'base/feed.html' %}
         </div>
 
+        <div>
+            {% include 'base/activity.html' %}
+        </div>
        
     </div>
 {% endblock content %}

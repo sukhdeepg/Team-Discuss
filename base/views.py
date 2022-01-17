@@ -67,13 +67,14 @@ def home(request):
     )
     group_count = groups.count()
     subjects = Subject.objects.all()
+    group_messages = Message.objects.filter(Q(group__subject__name__icontains=q))
 
-    context = {"groups": groups, "subjects": subjects, "group_count": group_count}
+    context = {"groups": groups, "subjects": subjects, "group_count": group_count, "group_messages": group_messages}
     return render(request, 'base/home.html', context)
 
 def group(request, pk):
     group = Group.objects.get(id=pk)
-    group_messages = group.message_set.all().order_by('-created')
+    group_messages = group.message_set.all()
     members = group.members.all()
 
     if request.method == 'POST':
