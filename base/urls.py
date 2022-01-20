@@ -1,3 +1,4 @@
+from os import name
 from django.urls import path
 from . import views
 
@@ -11,4 +12,5 @@ urlpatterns = [
     path('update-group/<str:pk>/', views.update_group, name="update-group"),
     path('delete-group/<str:pk>/', views.delete_group, name="delete-group"),
     path('delete-message/<str:pk>/', views.delete_message, name="delete-message"),
+    path('profile/<str:pk>/', views.user_profile, name="profile")
 ]

@@ -2,7 +2,7 @@
 <hr>
 {% for message in group_messages %}
     <div>
-        <small>@{{ message.user }}  {{ message.created|timesince }}</small>
+        <small><a href="{% url 'profile' message.user.id %}">@{{ message.user }}</a>  {{ message.created|timesince }}</small>
         <small>replied to "{{ message.group }}"</small>
         <p>{{ message }}</p>
         {% if request.user == message.user %}

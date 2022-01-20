@@ -1,3 +1,4 @@
+from curses.ascii import US
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
 from django.db.models import Q
@@ -145,3 +146,12 @@ def delete_message(request, pk):
 
     context = {"obj": message}
     return render(request, 'base/delete.html', context)
+
+def user_profile(request, pk):
+    user = User.objects.get(id=pk)
+    groups = user.group_set.all()
+    group_messages = user.message_set.all()
+    subjects = Subject.objects.all()
+
+    context = {"user": user, "groups": groups, "group_messages": group_messages, "subjects": subjects}
+    return render(request, 'base/profile.html', context)
