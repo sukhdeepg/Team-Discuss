@@ -1,3 +1,4 @@
+from ast import Sub
 from curses.ascii import US
 from django.shortcuts import render, redirect
 from django.http import HttpResponse
@@ -8,7 +9,7 @@ from django.contrib.auth.decorators import login_required
 from django.contrib import messages
 from django.contrib.auth.forms import UserCreationForm
 from .models import Group, Message, Subject
-from .forms import GroupForm
+from .forms import GroupForm, UserForm
 
 def login_user(request):
     page = 'login'
@@ -67,7 +68,7 @@ def home(request):
         Q(description__icontains=q)
     )
     group_count = groups.count()
-    subjects = Subject.objects.all()
+    subjects = Subject.objects.all()[0:5] # only get the first 5 subjects
     group_messages = Message.objects.filter(Q(group__subject__name__icontains=q))
 
     context = {"groups": groups, "subjects": subjects, "group_count": group_count, "group_messages": group_messages}
@@ -93,32 +94,42 @@ def group(request, pk):
 @login_required(login_url='login')
 def create_group(request):
     form = GroupForm()
-    if request.method == 'POST':
-        form = GroupForm(request.POST)
-        if form.is_valid():
-            group = form.save(commit=False)
-            group.moderator = request.user
-            group.save()
-            return redirect('home')
+    subjects = Subject.objects.all()
 
-    context = {"form": form}
+    if request.method == 'POST':
+        subject_name = request.POST.get("subject")
+        subject, is_created = Subject.objects.get_or_create(name=subject_name)
+        Group.objects.create(
+            moderator=request.user,
+            subject=subject,
+            name=request.POST.get("name"),
+            description=request.POST.get("description")
+        )
+
+        return redirect('home')
+
+    context = {"form": form, "subjects": subjects}
     return render(request, 'base/create_group.html', context)
 
 @login_required(login_url='login')
 def update_group(request, pk):
     group = Group.objects.get(id=pk)
     form = GroupForm(instance=group)
+    subjects = Subject.objects.all()
 
     if request.user != group.moderator:
         return HttpResponse('Action not allowed.')
 
     if request.method == 'POST':
-        form = GroupForm(request.POST, instance=group)
-        if form.is_valid():
-            form.save()
-            return redirect('home')
+        subject_name = request.POST.get("subject")
+        subject, is_created = Subject.objects.get_or_create(name=subject_name)
+        group.name = request.POST.get("name")
+        group.subject = subject
+        group.description = request.POST.get("description")
+        group.save()
+        return redirect('home')
 
-    context = {"form": form}
+    context = {"form": form, "subjects": subjects, "group": group}
     return render(request, 'base/create_group.html', context)
 
 @login_required(login_url='login')
@@ -157,3 +168,28 @@ def user_profile(request, pk):
 
     context = {"user": user, "groups": groups, "group_messages": group_messages, "subjects": subjects}
     return render(request, 'base/profile.html', context)
+
+@login_required(login_url='login')
+def update_user_profile(request):
+    user = request.user
+    form = UserForm(instance=user)
+
+    if request.method == 'POST':
+        form = UserForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            return redirect('profile', pk=user.id)
+
+    context = {"form": form}
+    return render(request, 'base/update_profile.html', context)
+
+def all_subjects(request):
+    q = request.GET.get('q', '')
+    subjects = Subject.objects.filter(name__icontains=q)
+    context = {"subjects": subjects}
+    return render(request, 'base/all_subjects.html', context)
+
+def all_activity(request):
+    group_messages = Message.objects.all()
+    context = {"group_messages": group_messages}
+    return render(request, 'base/all_activity.html', context)
