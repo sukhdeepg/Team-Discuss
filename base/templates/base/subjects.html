@@ -1,0 +1,22 @@
+<div class="subjects">
+    <div class="subjects__header">
+        <h2>Browse Subjects</h2>
+    </div>
+    <ul class="subjects__list">
+        <li>
+        <a href="{% url 'home' %}" class="active">All <span>{{ subjects.count }}</span></a>
+        </li>
+        {% for subject in subjects %}
+        <li>
+            <a href="{% url 'home' %}?q={{ subject.name }}">{{ subject.name }}<span>{{ subject.group_set.all.count }}</span></a>
+        </li>
+        {% endfor %}
+    </ul>
+    <a class="btn btn--link" href="{% url 'all-subjects' %}">
+        More
+        <svg version="1.1" xmlns="http://www.w3.org/2000/svg" width="32" height="32" viewBox="0 0 32 32">
+        <title>chevron-down</title>
+        <path d="M16 21l-13-13h-3l16 16 16-16h-3l-13 13z"></path>
+        </svg>
+    </a>
+</div>
